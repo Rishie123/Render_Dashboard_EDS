@@ -132,6 +132,6 @@ def update_graphs(selected_instruments, start_date, end_date):
 """
 
 
-if _name__ == "__main__":
+if __name__ == "__main__":
    
     app.run_server(debug=True)  # Start the Dash server in debug mode
