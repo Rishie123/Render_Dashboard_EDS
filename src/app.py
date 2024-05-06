@@ -130,8 +130,8 @@ def update_graphs(selected_instruments, start_date, end_date):
 7. https://www.coursera.org/projects/interactive-dashboards-plotly-dash?tab=guided-projects - Coursera Project
 
 """
-# Run the app
-app.run_server(debug=True)  # Start the Dash server in debug mode
+
+
 if _name__ == "__main__":
    
     app.run_server(debug=True)  # Start the Dash server in debug mode
