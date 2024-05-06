@@ -5,7 +5,6 @@ from dash.dependencies import Input, Output  # Callbacks to update layout based 
 import plotly.express as px  # Plotly Express for creating interactive visualizations
 import plotly.graph_objects as go  # Plotly Graph Objects for more control over visualizations
 import cProfile  # For time profiling
-from memory_profiler import profile  # For memory profiling
 
 #@profile  # Decorator to enable memory profiling
 """ Uncomment above line with @profile to do memory profiling of the code
