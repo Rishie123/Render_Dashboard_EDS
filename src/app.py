@@ -113,6 +113,9 @@ def update_graphs(selected_instruments, start_date, end_date):
     """The anomaly score chart shows the anomaly scores over time."""
     """It shows how the anomaly scores change over time."""
     # Anomaly Score Chart
+
+
+    
     anomaly_score_fig = px.line(
         filtered_data,
         x='Date',  # X-axis data
@@ -131,6 +134,7 @@ def update_graphs(selected_instruments, start_date, end_date):
 
 """
 
-if _name__ == "__main__":
+
+if __name__ == "__main__":
    
     app.run_server(debug=True)  # Start the Dash server in debug mode
