@@ -39,8 +39,8 @@ inotify==0.2.10
 ipykernel==6.29.4
 ipython==8.24.0
 ipywidgets==8.1.2
-jnius==1.1.0
-js==1.0
+jnius
+js
 keyring==25.2.0
 lockfile==0.12.2
 lxml==4.9.2
