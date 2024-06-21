@@ -5,19 +5,14 @@ from dash.dependencies import Input, Output  # Callbacks to update layout based 
 import plotly.express as px  # Plotly Express for creating interactive visualizations
 import plotly.graph_objects as go  # Plotly Graph Objects for more control over visualizations
 
-# Load the dataset
+ # Load the dataset
 data_path = "Solar_Orbiter_with_anomalies.csv"  # Path to dataset file
-data_path2 = "Solar_Orbiter_with_anomalies2.csv"
-shap_values_path = "shap_values.csv"  # Path to SHAP values file
-
+data_path2="Solar_Orbiter_with_anomalies2.csv"
 solar_data = pd.read_csv(data_path)  # Read dataset into DataFrame
-solar_data2 = pd.read_csv(data_path2)  # Read second dataset into DataFrame
-shap_values = pd.read_csv(shap_values_path)  # Read SHAP values into DataFrame
+solar_data2 = pd.read_csv(data_path2)   
 
-# Ensure 'Date' columns are in datetime format
-solar_data['Date'] = pd.to_datetime(solar_data['Date'])
-solar_data2['Date'] = pd.to_datetime(solar_data2['Date'])
-shap_values['Date'] = pd.to_datetime(shap_values['Date'])
+# Load SHAP values
+shap_values = pd.read_csv("shap_values.csv")  # Adjust the path as needed
 
 """
     Run the dashboard to visualize solar orbiter instrument data.
@@ -30,10 +25,10 @@ shap_values['Date'] = pd.to_datetime(shap_values['Date'])
     4. Correlation Heatmap: Shows the correlation between selected instruments.
     5. Anomaly Score Chart: Visualizes anomaly scores over time.
     6. SHAP Values: Provides Feature importance using SHAP Values.
-"""
+    """
 
 # Initialize the Dash app
-app = dash.Dash(__name__, title="Solar Orbiter Data Visualization")  # Title of the Dash app which is showed in the browser tab
+app = dash.Dash(__name__, title="Solar Orbiter Data Visualization") # Title of the Dash app which is showed in the browser tab
 server = app.server
 
 # Layout of the Dash app
@@ -41,9 +36,9 @@ app.layout = html.Div([
     html.H1("Solar Orbiter Instrument Data Visualization", style={'text-align': 'center'}),  # Title
     # Checklist to select instruments
     dcc.Checklist(
-        id='instrument-checklist',  # Component ID
+        id='instrument-checklist', # Component ID
         options=[{'label': col, 'value': col} for col in solar_data.columns[1:-2]],  # Options for checklist
-        # I have removed the last two columns as they contain anomaly scores, which are not required for visualization.
+        #I have removed the last two columns as they contain anomaly scores, which are not required for visualization.
         value=[solar_data.columns[1]],  # Default selected value (first instrument)
         inline=True
     ),
@@ -93,17 +88,9 @@ def update_graphs(selected_instruments, start_date, end_date):
     Returns:
     figs (list): List of figures for each graph.
     """
-    # Print statements for debugging
-    print(f"Selected instruments: {selected_instruments}")
-    print(f"Start date: {start_date}, End date: {end_date}")
-    
     filtered_data = solar_data[(solar_data['Date'] >= start_date) & (solar_data['Date'] <= end_date)]  # Filtering data based on selected date range
     filtered_data2 = solar_data2[(solar_data2['Date'] >= start_date) & (solar_data2['Date'] <= end_date)]  # Filtering data based on selected date range
     filtered_shap_values = shap_values[(shap_values['Date'] >= start_date) & (shap_values['Date'] <= end_date)]  # Filtering SHAP values based on selected date range
-
-    print(f"Filtered data shape: {filtered_data.shape}")
-    print(f"Filtered data2 shape: {filtered_data2.shape}")
-    print(f"Filtered SHAP values shape: {filtered_shap_values.shape}")
 
     # Time Series Chart
     time_series_fig = go.Figure()  # Creating a new figure for time series chart
@@ -137,7 +124,7 @@ def update_graphs(selected_instruments, start_date, end_date):
         mode='lines+markers',  # Display both lines and markers on the graph
         name='Anomaly Score',  # Name the trace, which will appear in the legend
         marker=dict(
-            color=['red' if val < 0 else 'blue' for val in filtered_data2['anomaly_score']],  # Use list comprehension to assign colors conditionally
+            color=[ 'red' if val < 0 else 'blue' for val in filtered_data2['anomaly_score'] ],  # Use list comprehension to assign colors conditionally
             # Markers will be red if the anomaly score is below 0, otherwise blue
             size=5,  # Set the size of the markers
             line=dict(
