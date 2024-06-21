@@ -7,8 +7,9 @@ import plotly.graph_objects as go  # Plotly Graph Objects for more control over 
 
  # Load the dataset
 data_path = "Solar_Orbiter_with_anomalies.csv"  # Path to dataset file
+data_path2="Solar_Orbiter_with_anomalies2.csv"
 solar_data = pd.read_csv(data_path)  # Read dataset into DataFrame
-   
+solar_data2 = pd.read_csv(data_path2)   
 
 
 """
@@ -84,7 +85,8 @@ def update_graphs(selected_instruments, start_date, end_date):
     figs (list): List of figures for each graph.
     """
     filtered_data = solar_data[(solar_data['Date'] >= start_date) & (solar_data['Date'] <= end_date)]  # Filtering data based on selected date range
-    
+    filtered_data2 = solar_data2[(solar_data2['Date'] >= start_date) & (solar_data2['Date'] <= end_date)]  # Filtering data based on selected date range
+
     """This chart shows the time series data for the selected instruments."""
     """I chose this visualization because it is an effective way to show how the data changes over time."""
     time_series_fig = go.Figure()  # Creating a new figure for time series chart
@@ -118,12 +120,12 @@ def update_graphs(selected_instruments, start_date, end_date):
     # Add traces for the anomaly score data
     # The trace defines how the data will be visualized, including style and condition-based formatting
     anomaly_score_fig.add_trace(go.Scatter(
-    x=filtered_data['Date'],  # Set the x-axis as the Date column of the filtered data
-    y=filtered_data['anomaly_score'],  # Set the y-axis as the anomaly_score column of the filtered data
+    x=filtered_data2['Date'],  # Set the x-axis as the Date column of the filtered data
+    y=filtered_data2['anomaly_score'],  # Set the y-axis as the anomaly_score column of the filtered data
     mode='lines+markers',  # Display both lines and markers on the graph
     name='Anomaly Score',  # Name the trace, which will appear in the legend
     marker=dict(
-        color=[ 'red' if val < 0 else 'blue' for val in filtered_data['anomaly_score'] ],  # Use list comprehension to assign colors conditionally
+        color=[ 'red' if val < 0 else 'blue' for val in filtered_data2['anomaly_score'] ],  # Use list comprehension to assign colors conditionally
         # Markers will be red if the anomaly score is below 0, otherwise blue
         size=5,  # Set the size of the markers
         line=dict(
