@@ -14,6 +14,11 @@ solar_data = pd.read_csv(data_path)  # Read dataset into DataFrame
 solar_data2 = pd.read_csv(data_path2)  # Read second dataset into DataFrame
 shap_values = pd.read_csv(shap_values_path)  # Read SHAP values into DataFrame
 
+# Ensure 'Date' columns are in datetime format
+solar_data['Date'] = pd.to_datetime(solar_data['Date'])
+solar_data2['Date'] = pd.to_datetime(solar_data2['Date'])
+shap_values['Date'] = pd.to_datetime(shap_values['Date'])
+
 """
     Run the dashboard to visualize solar orbiter instrument data.
 
@@ -88,9 +93,17 @@ def update_graphs(selected_instruments, start_date, end_date):
     Returns:
     figs (list): List of figures for each graph.
     """
+    # Print statements for debugging
+    print(f"Selected instruments: {selected_instruments}")
+    print(f"Start date: {start_date}, End date: {end_date}")
+    
     filtered_data = solar_data[(solar_data['Date'] >= start_date) & (solar_data['Date'] <= end_date)]  # Filtering data based on selected date range
     filtered_data2 = solar_data2[(solar_data2['Date'] >= start_date) & (solar_data2['Date'] <= end_date)]  # Filtering data based on selected date range
     filtered_shap_values = shap_values[(shap_values['Date'] >= start_date) & (shap_values['Date'] <= end_date)]  # Filtering SHAP values based on selected date range
+
+    print(f"Filtered data shape: {filtered_data.shape}")
+    print(f"Filtered data2 shape: {filtered_data2.shape}")
+    print(f"Filtered SHAP values shape: {filtered_shap_values.shape}")
 
     # Time Series Chart
     time_series_fig = go.Figure()  # Creating a new figure for time series chart
