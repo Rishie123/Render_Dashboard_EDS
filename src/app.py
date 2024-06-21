@@ -11,6 +11,8 @@ data_path2="Solar_Orbiter_with_anomalies2.csv"
 solar_data = pd.read_csv(data_path)  # Read dataset into DataFrame
 solar_data2 = pd.read_csv(data_path2)   
 
+# Load SHAP values
+shap_values = pd.read_csv("shap_values.csv")  # Adjust the path as needed
 
 """
     Run the dashboard to visualize solar orbiter instrument data.
@@ -25,11 +27,10 @@ solar_data2 = pd.read_csv(data_path2)
     6. SHAP Values: Provides Feature importance using SHAP Values.
     """
 
-
-    # Initialize the Dash app
+# Initialize the Dash app
 app = dash.Dash(__name__, title="Solar Orbiter Data Visualization") # Title of the Dash app which is showed in the browser tab
 server = app.server
-    
+
 # Layout of the Dash app
 app.layout = html.Div([
     html.H1("Solar Orbiter Instrument Data Visualization", style={'text-align': 'center'}),  # Title
@@ -57,23 +58,26 @@ app.layout = html.Div([
     html.Div([
         html.Div([dcc.Graph(id='anomaly-score-chart')], className="six columns"),  # Anomaly Score Chart
     ], className="row"),
-    html.Div(id='anomaly-stats', style={'margin-top': '20px', 'text-align': 'center'})  # Anomaly Stats
-    ,
+    html.Div([
+        html.Div([dcc.Graph(id='shap-feature-importance-chart')], className="six columns"),  # SHAP Feature Importance Chart
+    ], className="row"),
+    html.Div(id='anomaly-stats', style={'margin-top': '20px', 'text-align': 'center'}),  # Anomaly Stats
     html.Iframe(
         srcDoc=open("shap_values_plot.html").read(),
         style={"height": "500px", "width": "100%"}
     )
 ])
+
 # Callbacks to update graphs
 @app.callback(
     [Output('time-series-chart', 'figure'),
      Output('correlation-heatmap', 'figure'),
-     Output('anomaly-score-chart', 'figure')],
+     Output('anomaly-score-chart', 'figure'),
+     Output('shap-feature-importance-chart', 'figure')],
     [Input('instrument-checklist', 'value'),
      Input('date-picker-range', 'start_date'),
      Input('date-picker-range', 'end_date')]
 )
-
 def update_graphs(selected_instruments, start_date, end_date):
     """
     Callback function to update graphs based on user input.
@@ -86,9 +90,9 @@ def update_graphs(selected_instruments, start_date, end_date):
     """
     filtered_data = solar_data[(solar_data['Date'] >= start_date) & (solar_data['Date'] <= end_date)]  # Filtering data based on selected date range
     filtered_data2 = solar_data2[(solar_data2['Date'] >= start_date) & (solar_data2['Date'] <= end_date)]  # Filtering data based on selected date range
+    filtered_shap_values = shap_values[(shap_values['Date'] >= start_date) & (shap_values['Date'] <= end_date)]  # Filtering SHAP values based on selected date range
 
-    """This chart shows the time series data for the selected instruments."""
-    """I chose this visualization because it is an effective way to show how the data changes over time."""
+    # Time Series Chart
     time_series_fig = go.Figure()  # Creating a new figure for time series chart
     for instrument in selected_instruments:
         time_series_fig.add_trace(
@@ -100,9 +104,8 @@ def update_graphs(selected_instruments, start_date, end_date):
             )
         )
     time_series_fig.update_layout(title="Time Series of Selected Instruments")  # Updating layout of time series chart
+
     # Correlation Heatmap
-    """The correlation heatmap is a graphical representation of the correlation matrix.
-    I chose this visualization because it is an effective way to show the relationship between multiple variables."""
     correlation_fig = go.Figure(
         go.Heatmap(
             z=filtered_data[selected_instruments].corr(),  # Calculating correlation matrix
@@ -112,36 +115,50 @@ def update_graphs(selected_instruments, start_date, end_date):
         )
     )
     correlation_fig.update_layout(title="Correlation Heatmap")  # Updating layout of correlation heatmap
-    """The anomaly score chart shows the anomaly scores over time."""
-    """It shows how the anomaly scores change over time."""
+
     # Anomaly Score Chart
-
     anomaly_score_fig = go.Figure()  # Create a new figure for the anomaly score chart
-    # Add traces for the anomaly score data
-    # The trace defines how the data will be visualized, including style and condition-based formatting
     anomaly_score_fig.add_trace(go.Scatter(
-    x=filtered_data2['Date'],  # Set the x-axis as the Date column of the filtered data
-    y=filtered_data2['anomaly_score'],  # Set the y-axis as the anomaly_score column of the filtered data
-    mode='lines+markers',  # Display both lines and markers on the graph
-    name='Anomaly Score',  # Name the trace, which will appear in the legend
-    marker=dict(
-        color=[ 'red' if val < 0 else 'blue' for val in filtered_data2['anomaly_score'] ],  # Use list comprehension to assign colors conditionally
-        # Markers will be red if the anomaly score is below 0, otherwise blue
-        size=5,  # Set the size of the markers
-        line=dict(
-            color='DarkSlateGrey',  # Color of the line around each marker
-            width=2  # Width of the line around each marker
+        x=filtered_data2['Date'],  # Set the x-axis as the Date column of the filtered data
+        y=filtered_data2['anomaly_score'],  # Set the y-axis as the anomaly_score column of the filtered data
+        mode='lines+markers',  # Display both lines and markers on the graph
+        name='Anomaly Score',  # Name the trace, which will appear in the legend
+        marker=dict(
+            color=[ 'red' if val < 0 else 'blue' for val in filtered_data2['anomaly_score'] ],  # Use list comprehension to assign colors conditionally
+            # Markers will be red if the anomaly score is below 0, otherwise blue
+            size=5,  # Set the size of the markers
+            line=dict(
+                color='DarkSlateGrey',  # Color of the line around each marker
+                width=2  # Width of the line around each marker
+            )
         )
-    )
     ))
-
-    # Update the layout of the figure to add titles and improve readability
     anomaly_score_fig.update_layout(
-    title="Anomaly Scores Over Time (Lower the scores, higher chances of anomaly, negative score means definitely anomaly)",  # Main title of the chart
-    xaxis_title='Date',  # Title for the x-axis
-    yaxis_title='Anomaly Score'  # Title for the y-axis
+        title="Anomaly Scores Over Time (Lower the scores, higher chances of anomaly, negative score means definitely anomaly)",  # Main title of the chart
+        xaxis_title='Date',  # Title for the x-axis
+        yaxis_title='Anomaly Score'  # Title for the y-axis
     )
-    return time_series_fig, correlation_fig, anomaly_score_fig  # Return updated figures
+
+    # SHAP Feature Importance Chart
+    shap_feature_importance_fig = go.Figure()
+    for feature in selected_instruments:
+        shap_feature_importance_fig.add_trace(
+            go.Scatter(
+                x=filtered_shap_values['Date'],  # X-axis data
+                y=filtered_shap_values[feature],  # Y-axis data
+                mode='lines',  # Display mode
+                stackgroup='one',  # Stack the lines
+                name=feature  # Feature name
+            )
+        )
+    shap_feature_importance_fig.update_layout(
+        title="SHAP Feature Importance Over Time",
+        xaxis_title='Date',
+        yaxis_title='SHAP Value'
+    )
+
+    return time_series_fig, correlation_fig, anomaly_score_fig, shap_feature_importance_fig  # Return updated figures
+
 """References:
 1. https://dash.plotly.com/ - Dash Documentation
 2. https://dash.plotly.com/layout - Dash Layout (HTML Components)
@@ -150,10 +167,7 @@ def update_graphs(selected_instruments, start_date, end_date):
 5. https://plotly.com/python/plotly-express/ - Plotly Express ( px.line, px.scatter, px.bar)
 6. https://plotly.com/python/graph-objects/ - Plotly Graph Objects ( go.Scatter, go.Heatmap, go.Figure)
 7. https://www.coursera.org/projects/interactive-dashboards-plotly-dash?tab=guided-projects - Coursera Project
-
 """
 
-
 if __name__ == "__main__":
-   
     app.run_server(debug=True)  # Start the Dash server in debug mode
