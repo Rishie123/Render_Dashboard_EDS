@@ -24,15 +24,17 @@ feature_importance_fig = px.line(shap_data, x='Date', y=shap_data.columns[:-1],
 # Initialize the Dash app
 app = dash.Dash(__name__, title="Solar Orbiter Data Visualization")  # Title of the Dash app which is showed in the browser tab
 server = app.server
-    
+
+# Remove the 'Date' and 'anomaly_score' columns from the checklist options
+checklist_options = [{'label': col, 'value': col} for col in solar_data.columns if col not in ['Date', 'anomaly_score']]
+
 # Layout of the Dash app
 app.layout = html.Div([
     html.H1("Solar Orbiter Instrument Data Visualization", style={'text-align': 'center'}),  # Title
     # Checklist to select instruments
     dcc.Checklist(
         id='instrument-checklist',  # Component ID
-        options=[{'label': col, 'value': col} for col in solar_data.columns[1:-2]],  # Options for checklist
-        # I have removed the last two columns as they contain anomaly scores, which are not required for visualization.
+        options=checklist_options,  # Options for checklist
         value=[solar_data.columns[1]],  # Default selected value (first instrument)
         inline=True
     ),
