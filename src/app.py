@@ -4,7 +4,7 @@ from dash import dcc, html, dash_table  # Components for building layout
 from dash.dependencies import Input, Output  # Callbacks to update layout based on user input
 import plotly.express as px  # Plotly Express for creating interactive visualizations
 import plotly.graph_objects as go  # Plotly Graph Objects for more control over visualizations
-from sklearn.preprocessing import RobustScaler
+from sklearn.preprocessing import MinMaxScaler
 
 # Load the dataset
 data_path = "Solar_Orbiter_with_anomalies.csv"  # Path to dataset file
@@ -117,7 +117,7 @@ def update_graphs(selected_instruments, start_date, end_date):
     correlation_fig.update_layout(title="Correlation Heatmap")  # Updating layout of correlation heatmap
 
     # Scaled Time Series Chart
-    scaler = RobustScaler()
+    scaler = MinMaxScaler(feature_range=(-1, 1))
     scaled_data = filtered_data.copy()
     columns_to_scale = [col for col in selected_instruments if col not in ['IBS_R', 'IBS_T', 'IBS_N', 'OBS_R', 'OBS_T', 'OBS_N']]
     scaled_data[columns_to_scale] = scaler.fit_transform(filtered_data[columns_to_scale])
