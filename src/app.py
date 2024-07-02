@@ -4,6 +4,7 @@ from dash import dcc, html, dash_table  # Components for building layout
 from dash.dependencies import Input, Output  # Callbacks to update layout based on user input
 import plotly.express as px  # Plotly Express for creating interactive visualizations
 import plotly.graph_objects as go  # Plotly Graph Objects for more control over visualizations
+from sklearn.preprocessing import RobustScaler
 
 # Load the dataset
 data_path = "Solar_Orbiter_with_anomalies.csv"  # Path to dataset file
@@ -46,10 +47,13 @@ app.layout = html.Div([
         start_date=solar_data['Date'].min(),  # Default start date
         end_date=solar_data['Date'].max()  # Default end date
     ),
-    # Two rows, each containing two graphs
+    # Three rows, each containing graphs
     html.Div([
         html.Div([dcc.Graph(id='time-series-chart')], className="six columns"),  # Time Series Chart
         html.Div([dcc.Graph(id='correlation-heatmap')], className="six columns"),  # Correlation Heatmap
+    ], className="row"),
+    html.Div([
+        html.Div([dcc.Graph(id='scaled-time-series-chart')], className="six columns"),  # Scaled Time Series Chart
     ], className="row"),
     html.Div([
         html.Div([dcc.Graph(id='anomaly-score-chart')], className="six columns"),  # Anomaly Score Chart
@@ -69,6 +73,7 @@ app.layout = html.Div([
 @app.callback(
     [Output('time-series-chart', 'figure'),
      Output('correlation-heatmap', 'figure'),
+     Output('scaled-time-series-chart', 'figure'),
      Output('anomaly-score-chart', 'figure')],
     [Input('instrument-checklist', 'value'),
      Input('date-picker-range', 'start_date'),
@@ -110,7 +115,25 @@ def update_graphs(selected_instruments, start_date, end_date):
         )
     )
     correlation_fig.update_layout(title="Correlation Heatmap")  # Updating layout of correlation heatmap
-    
+
+    # Scaled Time Series Chart
+    scaler = RobustScaler()
+    scaled_data = filtered_data.copy()
+    columns_to_scale = [col for col in selected_instruments if col not in ['IBS_R', 'IBS_T', 'IBS_N', 'OBS_R', 'OBS_T', 'OBS_N']]
+    scaled_data[columns_to_scale] = scaler.fit_transform(filtered_data[columns_to_scale])
+
+    scaled_time_series_fig = go.Figure()  # Creating a new figure for scaled time series chart
+    for instrument in selected_instruments:
+        scaled_time_series_fig.add_trace(
+            go.Scatter(
+                x=scaled_data['Date'],  # X-axis data
+                y=scaled_data[instrument],  # Y-axis data
+                mode='lines+markers',  # Display mode
+                name=instrument  # Instrument name
+            )
+        )
+    scaled_time_series_fig.update_layout(title="Scaled Time Series Plot between -1 and 1")  # Updating layout of scaled time series chart
+
     # Anomaly Score Chart
     anomaly_score_fig = go.Figure()  # Create a new figure for the anomaly score chart
     anomaly_score_fig.add_trace(go.Scatter(
@@ -134,7 +157,7 @@ def update_graphs(selected_instruments, start_date, end_date):
         yaxis_title='Anomaly Score'  # Title for the y-axis
     )
     
-    return time_series_fig, correlation_fig, anomaly_score_fig  # Return updated figures
+    return time_series_fig, correlation_fig, scaled_time_series_fig, anomaly_score_fig  # Return updated figures
 
 """References:
 1. https://dash.plotly.com/ - Dash Documentation
