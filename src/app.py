@@ -12,6 +12,10 @@ data_path2 = "Solar_Orbiter_with_anomalies2.csv"
 solar_data = pd.read_csv(data_path)  # Read dataset into DataFrame
 solar_data2 = pd.read_csv(data_path2)   
 
+# Convert 'Date' columns to datetime
+solar_data['Date'] = pd.to_datetime(solar_data['Date'])
+solar_data2['Date'] = pd.to_datetime(solar_data2['Date'])
+
 # Load the SHAP values data
 shap_values_path = "shap_values.csv"  # Update with the correct path to your SHAP values CSV
 shap_data = pd.read_csv(shap_values_path)
@@ -171,7 +175,7 @@ def update_graphs(selected_instruments, start_date, end_date):
 """References:
 1. https://dash.plotly.com/ - Dash Documentation
 2. https://dash.plotly.com/layout - Dash Layout (HTML Components)
-3. https://dash.plotly.com/dash-core-components - Dash Core Components ( DatePickerRange, Checklist)
+3. https:// dash.plotly.com/dash-core-components - Dash Core Components ( DatePickerRange, Checklist)
 4. https://dash.plotly.com/dash-html-components - Dash HTML Components (Div, H1 , Iframe)
 5. https://plotly.com/python/plotly-express/ - Plotly Express ( px.line, px.scatter, px.bar)
 6. https://plotly.com/python/graph-objects/ - Plotly Graph Objects ( go.Scatter, go.Heatmap, go.Figure)
