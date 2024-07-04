@@ -12,17 +12,9 @@ data_path2 = "Solar_Orbiter_with_anomalies2.csv"
 solar_data = pd.read_csv(data_path)  # Read dataset into DataFrame
 solar_data2 = pd.read_csv(data_path2)   
 
-# Convert 'Date' columns to datetime
-solar_data['Date'] = pd.to_datetime(solar_data['Date'])
-solar_data2['Date'] = pd.to_datetime(solar_data2['Date'])
-
 # Load the SHAP values data
 shap_values_path = "shap_values.csv"  # Update with the correct path to your SHAP values CSV
 shap_data = pd.read_csv(shap_values_path)
-
-# Load the bad dates
-bad_dates_path = "bad_dates.csv"  # Path to bad dates file
-bad_dates = pd.read_csv(bad_dates_path, parse_dates=['start', 'end'])
 
 # Create the feature importance figure
 feature_importance_fig = px.line(shap_data, x='Date', y=shap_data.columns[:-1],
@@ -100,11 +92,6 @@ def update_graphs(selected_instruments, start_date, end_date):
     filtered_data = solar_data[(solar_data['Date'] >= start_date) & (solar_data['Date'] <= end_date)]  # Filtering data based on selected date range
     filtered_data2 = solar_data2[(solar_data2['Date'] >= start_date) & (solar_data2['Date'] <= end_date)]  # Filtering data based on selected date range
 
-    # Filter out bad dates from filtered_data
-    for _, row in bad_dates.iterrows():
-        filtered_data = filtered_data[(filtered_data['Date'] < row['start']) | (filtered_data['Date'] > row['end'])]
-        filtered_data2 = filtered_data2[(filtered_data2['Date'] < row['start']) | (filtered_data2['Date'] > row['end'])]
-
     # Time Series Chart
     time_series_fig = go.Figure()  # Creating a new figure for time series chart
     for instrument in selected_instruments:
@@ -175,7 +162,7 @@ def update_graphs(selected_instruments, start_date, end_date):
 """References:
 1. https://dash.plotly.com/ - Dash Documentation
 2. https://dash.plotly.com/layout - Dash Layout (HTML Components)
-3. https:// dash.plotly.com/dash-core-components - Dash Core Components ( DatePickerRange, Checklist)
+3. https://dash.plotly.com/dash-core-components - Dash Core Components ( DatePickerRange, Checklist)
 4. https://dash.plotly.com/dash-html-components - Dash HTML Components (Div, H1 , Iframe)
 5. https://plotly.com/python/plotly-express/ - Plotly Express ( px.line, px.scatter, px.bar)
 6. https://plotly.com/python/graph-objects/ - Plotly Graph Objects ( go.Scatter, go.Heatmap, go.Figure)
