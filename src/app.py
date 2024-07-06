@@ -12,6 +12,16 @@ data_path2 = "Solar_Orbiter_with_anomalies2.csv"
 solar_data = pd.read_csv(data_path)  # Read dataset into DataFrame
 solar_data2 = pd.read_csv(data_path2)   
 
+# Convert the 'Date' column to datetime format
+solar_data['Date'] = pd.to_datetime(solar_data['Date'])
+solar_data2['Date'] = pd.to_datetime(solar_data2['Date'])
+
+# Filter out data from May 5 to May 11
+start_exclude = pd.to_datetime('2021-05-05')
+end_exclude = pd.to_datetime('2021-05-11')
+solar_data = solar_data[~((solar_data['Date'] >= start_exclude) & (solar_data['Date'] <= end_exclude))]
+solar_data2 = solar_data2[~((solar_data2['Date'] >= start_exclude) & (solar_data2['Date'] <= end_exclude))]
+
 # Load the SHAP values data
 shap_values_path = "shap_values.csv"  # Update with the correct path to your SHAP values CSV
 shap_data = pd.read_csv(shap_values_path)
@@ -96,6 +106,12 @@ def update_graphs(selected_instruments, start_date, end_date):
     filtered_data = solar_data[(solar_data['Date'] >= start_date) & (solar_data['Date'] <= end_date)]  # Filtering data based on selected date range
     filtered_data2 = solar_data2[(solar_data2['Date'] >= start_date) & (solar_data2['Date'] <= end_date)]  # Filtering data based on selected date range
 
+    # Normalize the data
+    scaler = MinMaxScaler(feature_range=(-1, 1))
+    scaled_data = filtered_data.copy()
+    columns_to_scale = [col for col in selected_instruments if col not in ['IBS_R', 'IBS_T', 'IBS_N', 'OBS_R', 'OBS_T', 'OBS_N']]
+    scaled_data[columns_to_scale] = scaler.fit_transform(filtered_data[columns_to_scale])
+
     # Time Series Chart
     time_series_fig = go.Figure()  # Creating a new figure for time series chart
     for instrument in selected_instruments:
@@ -112,7 +128,7 @@ def update_graphs(selected_instruments, start_date, end_date):
     # Correlation Heatmap
     correlation_fig = go.Figure(
         go.Heatmap(
-            z=filtered_data[selected_instruments].corr(),  # Calculating correlation matrix
+            z=scaled_data[selected_instruments].corr(),  # Calculating correlation matrix on scaled data
             x=selected_instruments,  # X-axis labels
             y=selected_instruments,  # Y-axis labels
             colorscale='Viridis'  # Color scale
@@ -121,11 +137,6 @@ def update_graphs(selected_instruments, start_date, end_date):
     correlation_fig.update_layout(title="Correlation Heatmap")  # Updating layout of correlation heatmap
 
     # Scaled Time Series Chart
-    scaler = MinMaxScaler(feature_range=(-1, 1))
-    scaled_data = filtered_data.copy()
-    columns_to_scale = [col for col in selected_instruments if col not in ['IBS_R', 'IBS_T', 'IBS_N', 'OBS_R', 'OBS_T', 'OBS_N']]
-    scaled_data[columns_to_scale] = scaler.fit_transform(filtered_data[columns_to_scale])
-
     scaled_time_series_fig = go.Figure()  # Creating a new figure for scaled time series chart
     for instrument in selected_instruments:
         scaled_time_series_fig.add_trace(
@@ -162,10 +173,10 @@ def update_graphs(selected_instruments, start_date, end_date):
     )
     
     # 5-Day Rolling Mean Heatmap
-    rolling_mean_data = filtered_data[selected_instruments].rolling(window=5).mean()
+    rolling_mean_data = scaled_data[selected_instruments].rolling(window=5).mean()
     rolling_mean_fig = go.Figure(
         go.Heatmap(
-            z=rolling_mean_data.corr(),  # Correlation of rolling mean data
+            z=rolling_mean_data.corr(),  # Correlation of rolling mean data on scaled data
             x=selected_instruments,  # X-axis labels
             y=selected_instruments,  # Y-axis labels
             colorscale='Viridis'  # Color scale
