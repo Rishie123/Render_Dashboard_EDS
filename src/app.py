@@ -28,7 +28,7 @@ shap_data = pd.read_csv(shap_values_path)
 
 # Create the feature importance figure
 feature_importance_fig = px.line(shap_data, x='Date', y=shap_data.columns[:-1],
-                                 title='Feature Importance Over Time',
+                                 title='Feature Importance for Predicting Anomalies On Different Dates',
                                  labels={'value': 'SHAP Value', 'Date': 'Date'},
                                  template='plotly')
 
