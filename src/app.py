@@ -36,8 +36,8 @@ feature_importance_fig.update_layout(
     xaxis_title_font_size=22,  # Decrease x-axis title font size
     yaxis_title_font_size=22,  # Decrease y-axis title font size
     legend_font_size=22,  # Decrease legend font size
-    xaxis=dict(tickfont=dict(size=20)),  # Set x-axis tick labels size to 20
-    yaxis=dict(tickfont=dict(size=20))   # Set y-axis tick labels size to 20
+    xaxis=dict(tickfont=dict(size=18)),  # Set x-axis tick labels size to 18
+    yaxis=dict(tickfont=dict(size=18))   # Set y-axis tick labels size to 18
 )
 
 # Initialize the Dash app
@@ -137,8 +137,8 @@ def update_graphs(selected_instruments, start_date, end_date):
         xaxis_title_font_size=22,  # Decrease x-axis title font size
         yaxis_title_font_size=22,  # Decrease y-axis title font size
         legend_font_size=22,  # Decrease legend font size
-        xaxis=dict(tickfont=dict(size=20), titlefont=dict(size=22)),  # Set x-axis tick labels size to 20
-        yaxis=dict(tickfont=dict(size=20), titlefont=dict(size=22))   # Set y-axis tick labels size to 20
+        xaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22)),  # Set x-axis tick labels size to 18
+        yaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22))   # Set y-axis tick labels size to 18
     )  # Updating layout of time series chart
     
     # Correlation Heatmap
@@ -156,8 +156,8 @@ def update_graphs(selected_instruments, start_date, end_date):
         xaxis_title_font_size=22,  # Decrease x-axis title font size
         yaxis_title_font_size=22,  # Decrease y-axis title font size
         legend_font_size=22,  # Decrease legend font size
-        xaxis=dict(tickfont=dict(size=20), titlefont=dict(size=22)),  # Set x-axis tick labels size to 20
-        yaxis=dict(tickfont=dict(size=20), titlefont=dict(size=22))   # Set y-axis tick labels size to 20
+        xaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22)),  # Set x-axis tick labels size to 18
+        yaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22))   # Set y-axis tick labels size to 18
     )  # Updating layout of correlation heatmap
 
     # Scaled Time Series Chart
@@ -177,8 +177,8 @@ def update_graphs(selected_instruments, start_date, end_date):
         xaxis_title_font_size=22,  # Decrease x-axis title font size
         yaxis_title_font_size=22,  # Decrease y-axis title font size
         legend_font_size=22,  # Decrease legend font size
-        xaxis=dict(tickfont=dict(size=20), titlefont=dict(size=22)),  # Set x-axis tick labels size to 20
-        yaxis=dict(tickfont=dict(size=20), titlefont=dict(size=22))   # Set y-axis tick labels size to 20
+        xaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22)),  # Set x-axis tick labels size to 18
+        yaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22))   # Set y-axis tick labels size to 18
     )  # Updating layout of scaled time series chart
 
     # Anomaly Score Chart
@@ -206,8 +206,8 @@ def update_graphs(selected_instruments, start_date, end_date):
         xaxis_title_font_size=22,  # Decrease x-axis title font size
         yaxis_title_font_size=22,  # Decrease y-axis title font size
         legend_font_size=22,  # Decrease legend font size
-        xaxis=dict(tickfont=dict(size=20), titlefont=dict(size=22)),  # Set x-axis tick labels size to 20
-        yaxis=dict(tickfont=dict(size=20), titlefont=dict(size=22))   # Set y-axis tick labels size to 20
+        xaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22)),  # Set x-axis tick labels size to 18
+        yaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22))   # Set y-axis tick labels size to 18
     )
     
     # 5-Day Rolling Mean Heatmap
@@ -226,8 +226,8 @@ def update_graphs(selected_instruments, start_date, end_date):
         xaxis_title_font_size=22,  # Decrease x-axis title font size
         yaxis_title_font_size=22,  # Decrease y-axis title font size
         legend_font_size=22,  # Decrease legend font size
-        xaxis=dict(tickfont=dict(size=20), titlefont=dict(size=22)),  # Set x-axis tick labels size to 20
-        yaxis=dict(tickfont=dict(size=20), titlefont=dict(size=22))   # Set y-axis tick labels size to 20
+        xaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22)),  # Set x-axis tick labels size to 18
+        yaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22))   # Set y-axis tick labels size to 18
     )  # Updating layout of rolling mean heatmap
     
     return time_series_fig, correlation_fig, scaled_time_series_fig, anomaly_score_fig, rolling_mean_fig  # Return updated figures
