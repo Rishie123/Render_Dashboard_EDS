@@ -31,6 +31,12 @@ feature_importance_fig = px.line(shap_data, x='Date', y=shap_data.columns[:-1],
                                  title='Feature Importance for Predicting Anomalies On Different Dates',
                                  labels={'value': 'SHAP Value', 'Date': 'Date'},
                                  template='plotly')
+feature_importance_fig.update_layout(
+    title_font_size=32,  # Update title font size
+    xaxis_title_font_size=24,  # Update x-axis title font size
+    yaxis_title_font_size=24,  # Update y-axis title font size
+    legend_font_size=24  # Update legend font size
+)
 
 # Initialize the Dash app
 app = dash.Dash(__name__, title="Solar Orbiter Data Visualization")  # Title of the Dash app which is showed in the browser tab
@@ -123,7 +129,13 @@ def update_graphs(selected_instruments, start_date, end_date):
                 name=instrument  # Instrument name
             )
         )
-    time_series_fig.update_layout(title="Time Series of Selected Instruments")  # Updating layout of time series chart
+    time_series_fig.update_layout(
+        title="Time Series of Selected Instruments",
+        title_font_size=32,  # Update title font size
+        xaxis_title_font_size=24,  # Update x-axis title font size
+        yaxis_title_font_size=24,  # Update y-axis title font size
+        legend_font_size=24  # Update legend font size
+    )  # Updating layout of time series chart
     
     # Correlation Heatmap
     correlation_fig = go.Figure(
@@ -134,7 +146,13 @@ def update_graphs(selected_instruments, start_date, end_date):
             colorscale='Viridis'  # Color scale
         )
     )
-    correlation_fig.update_layout(title="Correlation Heatmap")  # Updating layout of correlation heatmap
+    correlation_fig.update_layout(
+        title="Correlation Heatmap",
+        title_font_size=32,  # Update title font size
+        xaxis_title_font_size=24,  # Update x-axis title font size
+        yaxis_title_font_size=24,  # Update y-axis title font size
+        legend_font_size=24  # Update legend font size
+    )  # Updating layout of correlation heatmap
 
     # Scaled Time Series Chart
     scaled_time_series_fig = go.Figure()  # Creating a new figure for scaled time series chart
@@ -147,7 +165,13 @@ def update_graphs(selected_instruments, start_date, end_date):
                 name=instrument  # Instrument name
             )
         )
-    scaled_time_series_fig.update_layout(title="Scaled Time Series Plot between -1 and 1")  # Updating layout of scaled time series chart
+    scaled_time_series_fig.update_layout(
+        title="Scaled Time Series Plot between -1 and 1",
+        title_font_size=32,  # Update title font size
+        xaxis_title_font_size=24,  # Update x-axis title font size
+        yaxis_title_font_size=24,  # Update y-axis title font size
+        legend_font_size=24  # Update legend font size
+    )  # Updating layout of scaled time series chart
 
     # Anomaly Score Chart
     anomaly_score_fig = go.Figure()  # Create a new figure for the anomaly score chart
@@ -169,7 +193,11 @@ def update_graphs(selected_instruments, start_date, end_date):
     anomaly_score_fig.update_layout(
         title="Anomaly Scores Over Time (Lower the scores, higher chances of anomaly, negative score means definitely anomaly)",  # Main title of the chart
         xaxis_title='Date',  # Title for the x-axis
-        yaxis_title='Anomaly Score'  # Title for the y-axis
+        yaxis_title='Anomaly Score',  # Title for the y-axis
+        title_font_size=32,  # Update title font size
+        xaxis_title_font_size=24,  # Update x-axis title font size
+        yaxis_title_font_size=24,  # Update y-axis title font size
+        legend_font_size=24  # Update legend font size
     )
     
     # 5-Day Rolling Mean Heatmap
@@ -182,7 +210,13 @@ def update_graphs(selected_instruments, start_date, end_date):
             colorscale='Viridis'  # Color scale
         )
     )
-    rolling_mean_fig.update_layout(title="5-Day Rolling Mean Correlation Heatmap")  # Updating layout of rolling mean heatmap
+    rolling_mean_fig.update_layout(
+        title="5-Day Rolling Mean Correlation Heatmap",
+        title_font_size=32,  # Update title font size
+        xaxis_title_font_size=24,  # Update x-axis title font size
+        yaxis_title_font_size=24,  # Update y-axis title font size
+        legend_font_size=24  # Update legend font size
+    )  # Updating layout of rolling mean heatmap
     
     return time_series_fig, correlation_fig, scaled_time_series_fig, anomaly_score_fig, rolling_mean_fig  # Return updated figures
 
