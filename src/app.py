@@ -76,6 +76,9 @@ app.layout = html.Div([
     html.Div([
         html.Div([dcc.Graph(id='anomaly-score-chart')], className="six columns"),  # Anomaly Score Chart
     ], className="row"),
+    html.Div([
+        html.Div([dcc.Graph(id='rolling-mean-heatmap')], className="six columns"),  # Rolling Mean Heatmap
+    ], className="row"),
     html.Div(id='anomaly-stats', style={'margin-top': '20px', 'text-align': 'center'}),  # Anomaly Stats
     html.Iframe(
         srcDoc=open("shap_values_plot.html").read(),
@@ -92,7 +95,8 @@ app.layout = html.Div([
     [Output('time-series-chart', 'figure'),
      Output('correlation-heatmap', 'figure'),
      Output('scaled-time-series-chart', 'figure'),
-     Output('anomaly-score-chart', 'figure')],
+     Output('anomaly-score-chart', 'figure'),
+     Output('rolling-mean-heatmap', 'figure')],
     [Input('instrument-checklist', 'value'),
      Input('date-picker-range', 'start_date'),
      Input('date-picker-range', 'end_date')]
@@ -138,28 +142,14 @@ def update_graphs(selected_instruments, start_date, end_date):
     )  # Updating layout of time series chart
     
     # Correlation Heatmap
-    correlation_matrix = scaled_data[selected_instruments].corr()
     correlation_fig = go.Figure(
         go.Heatmap(
-            z=correlation_matrix.values,  # Calculating correlation matrix on scaled data
+            z=scaled_data[selected_instruments].corr(),  # Calculating correlation matrix on scaled data
             x=selected_instruments,  # X-axis labels
             y=selected_instruments,  # Y-axis labels
             colorscale='Viridis'  # Color scale
         )
     )
-    # Add annotations for each cell in the heatmap
-    annotations = []
-    for i in range(len(correlation_matrix)):
-        for j in range(len(correlation_matrix)):
-            annotations.append(
-                go.layout.Annotation(
-                    text=str(round(correlation_matrix.iloc[i, j], 2)),  # Format correlation value to 2 decimal places
-                    x=selected_instruments[j],  # X-axis position
-                    y=selected_instruments[i],  # Y-axis position
-                    showarrow=False,  # Don't show arrow
-                    font=dict(color='white' if abs(correlation_matrix.iloc[i, j]) > 0.5 else 'black')  # Font color based on value
-                )
-            )
     correlation_fig.update_layout(
         title="Correlation Heatmap",
         title_font_size=28,  # Decrease title font size
@@ -167,9 +157,8 @@ def update_graphs(selected_instruments, start_date, end_date):
         yaxis_title_font_size=22,  # Decrease y-axis title font size
         legend_font_size=22,  # Decrease legend font size
         xaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22)),  # Set x-axis tick labels size to 18
-        yaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22)),   # Set y-axis tick labels size to 18
-        annotations=annotations  # Add annotations to the layout
-    )
+        yaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22))   # Set y-axis tick labels size to 18
+    )  # Updating layout of correlation heatmap
 
     # Scaled Time Series Chart
     scaled_time_series_fig = go.Figure()  # Creating a new figure for scaled time series chart
@@ -218,10 +207,30 @@ def update_graphs(selected_instruments, start_date, end_date):
         yaxis_title_font_size=22,  # Decrease y-axis title font size
         legend_font_size=22,  # Decrease legend font size
         xaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22)),  # Set x-axis tick labels size to 18
-        yaxis=dict(tickfont(dict(size=18), titlefont=dict(size=22)))   # Set y-axis tick labels size to 18
+        yaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22))   # Set y-axis tick labels size to 18
     )
-
-    return time_series_fig, correlation_fig, scaled_time_series_fig, anomaly_score_fig  # Return updated figures
+    
+    # 5-Day Rolling Mean Heatmap
+    rolling_mean_data = scaled_data[selected_instruments].rolling(window=5).mean()
+    rolling_mean_fig = go.Figure(
+        go.Heatmap(
+            z=rolling_mean_data.corr(),  # Correlation of rolling mean data on scaled data
+            x=selected_instruments,  # X-axis labels
+            y=selected_instruments,  # Y-axis labels
+            colorscale='Viridis'  # Color scale
+        )
+    )
+    rolling_mean_fig.update_layout(
+        title="5-Day Rolling Mean Correlation Heatmap",
+        title_font_size=28,  # Decrease title font size
+        xaxis_title_font_size=22,  # Decrease x-axis title font size
+        yaxis_title_font_size=22,  # Decrease y-axis title font size
+        legend_font_size=22,  # Decrease legend font size
+        xaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22)),  # Set x-axis tick labels size to 18
+        yaxis=dict(tickfont=dict(size=18), titlefont=dict(size=22))   # Set y-axis tick labels size to 18
+    )  # Updating layout of rolling mean heatmap
+    
+    return time_series_fig, correlation_fig, scaled_time_series_fig, anomaly_score_fig, rolling_mean_fig  # Return updated figures
 
 """References:
 1. https://dash.plotly.com/ - Dash Documentation
